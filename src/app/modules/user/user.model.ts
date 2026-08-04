@@ -16,6 +16,7 @@ const userSchema = new Schema<IUser, UserModal>(
       type: String,
       enum: Object.values(USER_ROLES),
       required: true,
+      default: USER_ROLES.USER,
     },
     email: {
       type: String,
@@ -32,6 +33,14 @@ const userSchema = new Schema<IUser, UserModal>(
     image: {
       type: String,
       default: 'https://i.ibb.co/z5YHLV9/profile.png',
+    },
+    location:{
+      type: String, 
+      default:""
+    },
+    contact:{
+      type: String , 
+      default:""
     },
     status: {
       type: String,
@@ -74,12 +83,11 @@ userSchema.statics.isExistUserByEmail = async (email: string) => {
   return isExist;
 };
 
-//is match password
 userSchema.statics.isMatchPassword = async (
   password: string,
   hashPassword: string
 ): Promise<boolean> => {
-  return await bcrypt.compare(password, hashPassword);
+  return await bcrypt.compare(String(password), hashPassword);
 };
 
 //check user

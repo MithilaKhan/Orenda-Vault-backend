@@ -157,7 +157,7 @@ const resetPasswordToDB = async (
   //isExist token
   const isExistToken = await ResetToken.isExistToken(token);
   if (!isExistToken) {
-    throw new ApiError(StatusCodes.UNAUTHORIZED, 'You are not authorized');
+    throw new ApiError(StatusCodes.UNAUTHORIZED, `You are not authorized. Invalid token: '${token}'`);
   }
 
   //user permission check
@@ -189,7 +189,7 @@ const resetPasswordToDB = async (
   }
 
   const hashPassword = await bcrypt.hash(
-    newPassword,
+    String(newPassword),
     Number(config.bcrypt_salt_rounds)
   );
 
@@ -240,7 +240,7 @@ const changePasswordToDB = async (
 
   //hash password
   const hashPassword = await bcrypt.hash(
-    newPassword,
+    String(newPassword),
     Number(config.bcrypt_salt_rounds)
   );
 
