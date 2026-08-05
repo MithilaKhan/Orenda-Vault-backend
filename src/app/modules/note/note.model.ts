@@ -19,7 +19,7 @@ const noteSchema = new Schema<Inote, NoteModel>({
         type: Schema.Types.ObjectId,
         ref: "User",
         required: true,
-    }
-})
+    },
+}, { suppressReservedKeysWarning: true })
 
 export const Note = model<Inote, NoteModel>("Note", noteSchema)

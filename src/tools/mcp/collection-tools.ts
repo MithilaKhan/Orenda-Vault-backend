@@ -16,16 +16,27 @@ export function createCollectionTool(server: McpServer) {
             },
         },
         async ({ title, description, icon, userId }) => {
-        const result = await CollectionService.createCollectionToDB({ title, description, icon, user: userId as any });
-
-            return {
-                content: [
-                    {
-                        type: "text",
-                        text: `Collection created with ID: ${result}`,
-                    },
-                ],
-            };
+            try {
+                const result = await CollectionService.createCollectionToDB({ title, description, icon, user: userId as any });
+                return {
+                    content: [
+                        {
+                            type: "text",
+                            text: `Collection created successfully with ID: ${result._id}`,
+                        },
+                    ],
+                };
+            } catch (error: any) {
+                return {
+                    isError: true,
+                    content: [
+                        {
+                            type: "text",
+                            text: error.message || "Failed to create collection",
+                        },
+                    ],
+                };
+            }
         }
     );
 }

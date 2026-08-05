@@ -9,16 +9,6 @@ import { seedSuperAdmin } from "./DB/seedAdmin";
 import { setupCluster } from "./config/cluster/node.cluster";
 import cluster from 'cluster';
 import { loadConsumer } from "./tools/kafka/kafka-consumers"; 
-import { mcpServerConnect } from "./connect.mcp.server";
-
-// import { setupSecurity } from "./app/modules/cluster/setup.security";
-
-//uncaught exception
-// process.on('uncaughtException', error => {
-//     errorLogger.error('uncaughtException Detected', error);
-//     process.exit(1);
-// });
-
 
 if (cluster.isPrimary) {
     process.on('uncaughtException', error => {
@@ -41,8 +31,7 @@ export async function main() {
 
         // Seed super admin
         await seedSuperAdmin();  
-        await mcpServerConnect()
-      // loadConsumer() // if you  yse kafka
+        // loadConsumer() // if you use kafka
 
         // Start HTTP server
         const port = typeof config.port === 'number' ? config.port : Number(config.port);
