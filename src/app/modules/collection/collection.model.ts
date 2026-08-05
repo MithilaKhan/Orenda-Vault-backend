@@ -8,11 +8,11 @@ const collectionSchema= new Schema<Icollection,CollectionModel>({
     }, 
     description:{
         type:String, 
-        optional:true 
+        default: "" 
     },  
     icon:{
         type:String, 
-        optional:true 
+        default: "" 
     },  
     user:{ 
         type:Schema.Types.ObjectId,
