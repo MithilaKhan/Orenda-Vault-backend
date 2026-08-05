@@ -8,7 +8,9 @@ import { Server } from "socket.io";
 import { seedSuperAdmin } from "./DB/seedAdmin";
 import { setupCluster } from "./config/cluster/node.cluster";
 import cluster from 'cluster';
-import { loadConsumer } from "./tools/kafka/kafka-consumers";
+import { loadConsumer } from "./tools/kafka/kafka-consumers"; 
+import { mcpServerConnect } from "./connect.mcp.server";
+
 // import { setupSecurity } from "./app/modules/cluster/setup.security";
 
 //uncaught exception
@@ -38,7 +40,8 @@ export async function main() {
         logger.info(colors.green('🚀 Database connected successfully'));
 
         // Seed super admin
-        await seedSuperAdmin();
+        await seedSuperAdmin();  
+        await mcpServerConnect()
       // loadConsumer() // if you  yse kafka
 
         // Start HTTP server

@@ -38,5 +38,5 @@ export default {
   },
   elasticSearch: {
     url: process.env.ELASTICSEARCH_URL
-  }
+  }, 
 };

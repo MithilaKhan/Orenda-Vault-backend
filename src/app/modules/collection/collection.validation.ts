@@ -2,17 +2,17 @@ import z from "zod";
 
 const createCollectionZodSchema = z.object({
     body: z.object({
-        title: z.string({ required_error: "Title is required" }),
-        description: z.string({ required_error: "Description is required" }).optional(),
-        icon: z.string({ required_error: "Icon is required" }),
+        title: z.string({ message: "Title is required" }),
+        description: z.string({ message: "Description is required" }).optional(),
+        icon: z.string({ message: "Icon is required" }),
     })
 })
 
 const updateCollectionZodSchema = z.object({
     body: z.object({
-        title: z.string({ required_error: "Title is required" }).optional(),
-        description: z.string({ required_error: "Description is required" }).optional(),
-        icon: z.string({ required_error: "Icon is required" }).optional(),
+        title: z.string({ message: "Title is required" }).optional(),
+        description: z.string({ message: "Description is required" }).optional(),
+        icon: z.string({ message: "Icon is required" }).optional(),
     })
 })
 
