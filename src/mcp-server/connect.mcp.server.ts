@@ -1,7 +1,7 @@
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { server } from "./mcp.server";
 import mongoose from "mongoose";
-import config from "./config";
+import config from "../config";
 
 export async function mcpServerConnect() {
     if (config.database_url) {
