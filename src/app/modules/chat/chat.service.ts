@@ -41,7 +41,7 @@ const processChatMessage = async (messages: any[]) => {
   const textMessage: any = response.output.find((item: any) => item.type === "message" || item.type === "text" || item.type === "message_call");
   
   return {
-    text: textMessage?.text || "No response received",
+    text: textMessage?.content?.[0]?.text || textMessage?.text || "No response received",
     toolResult: null
   };
 };
