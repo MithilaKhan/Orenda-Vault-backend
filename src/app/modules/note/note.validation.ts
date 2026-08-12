@@ -4,7 +4,7 @@ const createNoteZodSchema = z.object({
     body: z.object({
         title: z.string({ message: "Title is required" }),
         description: z.string({ message: "Description is required" }),
-        collection: z.string({ message: "Collection is required" }),
+        collection: z.string({ message: "Collection is required" }).optional(),
     })
 })
 

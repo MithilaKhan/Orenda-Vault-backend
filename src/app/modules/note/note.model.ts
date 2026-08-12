@@ -13,13 +13,13 @@ const noteSchema = new Schema<Inote, NoteModel>({
     collection: {
         type: Schema.Types.ObjectId,
         ref: "Collection",
-        required: true,
+        required: false,
     },
     user: {
         type: Schema.Types.ObjectId,
         ref: "User",
         required: true,
     },
-}, { suppressReservedKeysWarning: true })
+}, { suppressReservedKeysWarning: true, timestamps: true })
 
 export const Note = model<Inote, NoteModel>("Note", noteSchema)

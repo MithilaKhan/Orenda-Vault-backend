@@ -19,6 +19,6 @@ const collectionSchema= new Schema<Icollection,CollectionModel>({
         ref:"User",
         required:true,
     }
-}) 
+}, { timestamps: true }) 
 
 export const Collection= model<Icollection,CollectionModel>("Collection",collectionSchema)
