@@ -1,9 +1,9 @@
-import { ZodError } from 'zod';
 import { IErrorMessage } from '../types/errors.types';
 
-const handleZodError = (error: ZodError) => {
-  console.log(error.errors);
-  const errorMessages: IErrorMessage[] = error.errors.map(el => {
+const handleZodError = (error: any) => {
+  const issues = error.issues || error.errors || [];
+  console.log(issues);
+  const errorMessages: IErrorMessage[] = issues.map((el: any) => {
     return {
       path: el.path[el.path.length - 1],
       message: el.message,
