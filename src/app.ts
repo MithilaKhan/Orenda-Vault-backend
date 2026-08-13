@@ -11,6 +11,7 @@ import requestIp from 'request-ip';
 import { handleChunkUpload } from './helpers/handleChunkUpload';
 import { fileStreamHandler } from './helpers/fileStreamingHelper';
 import { handleStripeWebhook } from './webhooks/handleStripeWebhook';
+import { mcpRoutes } from './mcp-server/mcp.routes';
 const app = express();
 // app.get("/stripe/webhook",express.raw({type:"application/json"}),handleStripeWebhook); /// stripe webhook
 const limiter = rateLimit({
@@ -52,6 +53,7 @@ app.use(express.static('uploads'));
 //router
 app.post('/api/v1/upload/chunk', handleChunkUpload);
 app.use('/api/v1', router);
+app.use('/api/mcp', mcpRoutes);
 
 
 //live response

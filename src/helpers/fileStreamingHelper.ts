@@ -16,7 +16,7 @@ export const fileStreamHandler = async (req: Request, res: Response) => {
 
     const stat = fs.statSync(filePath);
     const fileSize = stat.size;
-    const contentType = mime.getType(filePath) || 'application/octet-stream';
+    const contentType = (mime as any).getType(filePath) || 'application/octet-stream';
 
     // Handle HEAD requests for metadata only
     if (req.method === 'HEAD') {
