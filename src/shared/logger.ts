@@ -29,17 +29,19 @@ const logger = createLogger({
   format: combine(label({ label: 'SERVER-NAME' }), timestamp(), myFormat),
   transports: [
     new transports.Console(),
-    new DailyRotateFile({
-      filename: path.join(
-        process.cwd(),
-        'winston',
-        'success',
-        '%DATE%-success.log'
-      ),
-      datePattern: 'DD-MM-YYYY-HH',
-      maxSize: '20m',
-      maxFiles: '1d',
-    }),
+    ...(process.env.VERCEL ? [] : [
+      new DailyRotateFile({
+        filename: path.join(
+          process.cwd(),
+          'winston',
+          'success',
+          '%DATE%-success.log'
+        ),
+        datePattern: 'DD-MM-YYYY-HH',
+        maxSize: '20m',
+        maxFiles: '1d',
+      }),
+    ]),
   ],
 });
 
@@ -48,17 +50,19 @@ const errorLogger = createLogger({
   format: combine(label({ label: 'SERVER-NAME' }), timestamp(), myFormat),
   transports: [
     new transports.Console(),
-    new DailyRotateFile({
-      filename: path.join(
-        process.cwd(),
-        'winston',
-        'error',
-        '%DATE%-error.log'
-      ),
-      datePattern: 'DD-MM-YYYY-HH',
-      maxSize: '20m',
-      maxFiles: '1d',
-    }),
+    ...(process.env.VERCEL ? [] : [
+      new DailyRotateFile({
+        filename: path.join(
+          process.cwd(),
+          'winston',
+          'error',
+          '%DATE%-error.log'
+        ),
+        datePattern: 'DD-MM-YYYY-HH',
+        maxSize: '20m',
+        maxFiles: '1d',
+      }),
+    ]),
   ],
 });
 
