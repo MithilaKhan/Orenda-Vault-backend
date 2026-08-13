@@ -70,16 +70,8 @@ export async function main() {
 async function bootstrap() {
     try {
         // setupSecurity();
-        if (config.node_env === 'production') {
-            setupCluster();
-        } else {
-
-
-            logger.info("dev mode");
-
-
-            await main();
-        }
+        logger.info("Running in single instance mode");
+        await main();
     } catch (error) {
         errorLogger.error(colors.red('🤢 Failed to bootstrap application:'), error);
         process.exit(1);

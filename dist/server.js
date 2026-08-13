@@ -21,7 +21,6 @@ const colors_1 = __importDefault(require("colors"));
 const socketHelper_1 = require("./helpers/socketHelper");
 const socket_io_1 = require("socket.io");
 const seedAdmin_1 = require("./DB/seedAdmin");
-const node_cluster_1 = require("./config/cluster/node.cluster");
 const cluster_1 = __importDefault(require("cluster"));
 if (cluster_1.default.isPrimary) {
     process.on('uncaughtException', error => {
@@ -77,13 +76,8 @@ function bootstrap() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             // setupSecurity();
-            if (config_1.default.node_env === 'production') {
-                (0, node_cluster_1.setupCluster)();
-            }
-            else {
-                logger_1.logger.info("dev mode");
-                yield main();
-            }
+            logger_1.logger.info("Running in single instance mode");
+            yield main();
         }
         catch (error) {
             logger_1.errorLogger.error(colors_1.default.red('🤢 Failed to bootstrap application:'), error);
