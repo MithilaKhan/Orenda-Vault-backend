@@ -13,6 +13,8 @@ import { fileStreamHandler } from './helpers/fileStreamingHelper';
 import { handleStripeWebhook } from './webhooks/handleStripeWebhook';
 import { mcpRoutes } from './mcp-server/mcp.routes';
 const app = express();
+app.use(cors()); // Allow CORS preflight before rate limits
+
 // app.get("/stripe/webhook",express.raw({type:"application/json"}),handleStripeWebhook); /// stripe webhook
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
@@ -43,7 +45,7 @@ app.use(Morgan.successHandler);
 app.use(Morgan.errorHandler);
 
 //body parser
-app.use(cors());
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

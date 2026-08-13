@@ -17,6 +17,7 @@ const handleChunkUpload_1 = require("./helpers/handleChunkUpload");
 const fileStreamingHelper_1 = require("./helpers/fileStreamingHelper");
 const mcp_routes_1 = require("./mcp-server/mcp.routes");
 const app = (0, express_1.default)();
+app.use((0, cors_1.default)()); // Allow CORS preflight before rate limits
 // app.get("/stripe/webhook",express.raw({type:"application/json"}),handleStripeWebhook); /// stripe webhook
 const limiter = (0, express_rate_limit_1.default)({
     windowMs: 15 * 60 * 1000, // 15 minutes
@@ -45,7 +46,6 @@ app.use(limiter);
 app.use(morgen_1.Morgan.successHandler);
 app.use(morgen_1.Morgan.errorHandler);
 //body parser
-app.use((0, cors_1.default)());
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 //file retrieve

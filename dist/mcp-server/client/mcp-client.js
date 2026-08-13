@@ -12,9 +12,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getClient = getClient;
 const index_js_1 = require("@modelcontextprotocol/sdk/client/index.js");
 const stdio_js_1 = require("@modelcontextprotocol/sdk/client/stdio.js");
+const isProduction = process.env.NODE_ENV === 'production';
 const transport = new stdio_js_1.StdioClientTransport({
-    command: "npx",
-    args: ["tsx", "src/mcp-server/connect.mcp.server.ts"],
+    command: isProduction ? "node" : "npx",
+    args: isProduction
+        ? ["dist/mcp-server/connect.mcp.server.js"]
+        : ["tsx", "src/mcp-server/connect.mcp.server.ts"],
 });
 const client = new index_js_1.Client({
     name: "my-ai-client",
