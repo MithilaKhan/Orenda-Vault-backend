@@ -49,7 +49,10 @@ const fileUploadHandler = (customFile: FileUpload[] = []) => {
     }
   }
 
-  const baseUploadDir = path.join(process.cwd(), 'uploads');
+  const baseUploadDir = process.env.VERCEL
+    ? path.join('/tmp', 'uploads')
+    : path.join(process.cwd(), 'uploads');
+    
   if (!fs.existsSync(baseUploadDir)) {
     fs.mkdirSync(baseUploadDir, { recursive: true });
   }
