@@ -5,6 +5,7 @@ export type Inote = {
     description: string,
     collection?: Types.ObjectId | null,
     user: Types.ObjectId,
+    isFavorite?: boolean,
 }
 
 export type NoteModel = Model<Inote>;

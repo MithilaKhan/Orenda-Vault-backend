@@ -20,6 +20,10 @@ const noteSchema = new Schema<Inote, NoteModel>({
         ref: "User",
         required: true,
     },
+    isFavorite: {
+        type: Boolean,
+        default: false,
+    },
 }, { suppressReservedKeysWarning: true, timestamps: true })
 
 export const Note = model<Inote, NoteModel>("Note", noteSchema)
