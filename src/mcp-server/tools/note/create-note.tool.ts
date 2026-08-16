@@ -11,7 +11,7 @@ export function createNoteTool(server: McpServer) {
             inputSchema: {
                 title: z.string().describe("The primary name or title for the new note. E.g., 'Meeting Minutes', 'Shopping List'."),
                 description: z.string().describe("The main content or body text of the note."),
-                collectionId: z.string().describe("The unique identifier (MongoDB Object ID) of the collection where this note will be saved. If you don't know it, use 'getAllCollection' to search for it first."),
+                collectionId: z.string().optional().describe("The unique identifier (MongoDB Object ID) of the collection where this note will be saved. Omit or pass null if you don't want to choose any collection."),
                 userId: z.string().describe("The unique identifier (MongoDB Object ID) of the user who owns this note."),
             },
         },

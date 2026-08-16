@@ -4,6 +4,13 @@ import { Note } from "./note.model";
 import { StatusCodes } from "http-status-codes";
 
 const createNoteToDB = async (payload: Inote) => {
+    if (payload.hasOwnProperty('collection')) {
+        const colStr = String(payload.collection).trim();
+        if (!payload.collection || colStr === "" || colStr === "null" || colStr === "undefined" || colStr === "No Collection (General)") {
+            payload.collection = null;
+        }
+    }
+
     const isExist = await Note.findOne({ user: payload.user, title: payload.title })
     if (isExist) {
         throw new ApiError(StatusCodes.BAD_REQUEST, "You already have a Note with this name!")
@@ -36,6 +43,13 @@ const getAllNoteToDB = async (userId: string, query: { search?: string, page?: s
 }
 
 const updateNoteToDB = async (id: string, payload: Partial<Inote>, userId: string) => {
+    if (payload.hasOwnProperty('collection')) {
+        const colStr = String(payload.collection).trim();
+        if (!payload.collection || colStr === "" || colStr === "null" || colStr === "undefined" || colStr === "No Collection (General)") {
+            payload.collection = null;
+        }
+    }
+
     const isExist = await Note.findById(id)
     if (!isExist) {
         throw new ApiError(StatusCodes.BAD_REQUEST, "Note not found!")
