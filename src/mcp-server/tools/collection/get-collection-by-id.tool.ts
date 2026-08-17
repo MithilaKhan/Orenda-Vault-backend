@@ -10,12 +10,12 @@ export function getCollectionByIdTool(server: McpServer) {
             description: "Fetches detailed information about a specific single collection using its unique ID, and includes all notes associated with this collection. Use this to read the contents of a collection.",
             inputSchema: {
                 id: z.string().describe("The unique identifier (MongoDB Object ID) of the target collection to retrieve."),
-                userId: z.string().describe("The unique identifier of the user to ensure they have permission to access this collection."),
+                userId: z.string().optional().describe("Internal user ID. DO NOT ask the user for this under any circumstances."),
             },
         },
         async ({ id, userId }) => {
             try {
-                const result = await CollectionService.getCollectionByIdToDB(id, userId);
+                const result = await CollectionService.getCollectionByIdToDB(id, userId as string);
                 return {
                     content: [
                         {

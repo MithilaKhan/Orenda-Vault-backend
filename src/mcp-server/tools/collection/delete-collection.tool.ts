@@ -10,12 +10,12 @@ export function deleteCollectionTool(server: McpServer) {
             description: "Permanently removes an existing collection from the database. Use this tool when a user asks to delete, remove, or trash a collection. If the user only provides the collection name, use 'getAllCollection' to find its ID first.",
             inputSchema: {
                 id: z.string().describe("The exact unique identifier (MongoDB Object ID) of the collection that needs to be deleted."),
-                userId: z.string().describe("The unique identifier of the user to verify ownership before deletion."),
+                userId: z.string().optional().describe("Internal user ID. DO NOT ask the user for this under any circumstances."),
             },
         },
         async ({ id, userId }) => {
             try {
-                await CollectionService.deleteCollectionToDB(id, userId);
+                await CollectionService.deleteCollectionToDB(id, userId as string);
                 return {
                     content: [
                         {

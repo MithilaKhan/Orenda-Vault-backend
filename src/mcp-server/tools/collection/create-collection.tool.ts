@@ -11,13 +11,13 @@ export function createCollectionTool(server: McpServer) {
             inputSchema: {
                 title: z.string().describe("The primary name or title for the new collection. E.g., 'My Projects', 'Ideas'."),
                 description: z.string().describe("A brief summary or detailed explanation of what this collection will contain."),
-                icon: z.enum(["FileText", "Code", "Briefcase", "Folder"]).describe("Visual representation icon for the collection. Choose an appropriate icon based on the collection's context (e.g., 'Briefcase' for work, 'Code' for programming)."),
-                userId: z.string().describe("The unique identifier (MongoDB Object ID) of the user who owns this collection."),
+                icon: z.enum(["FileText", "Code", "Briefcase", "Folder"]).optional().describe("Visual representation icon for the collection. Choose an appropriate icon based on the collection's context (e.g., 'Briefcase' for work, 'Code' for programming). DO NOT ask the user for an icon; default to 'FileText' if not specified or not mentioned by the user."),
+                userId: z.string().optional().describe("Internal user ID. DO NOT ask the user for this under any circumstances."),
             },
         },
         async ({ title, description, icon, userId }) => {
             try {
-                const result = await CollectionService.createCollectionToDB({ title, description, icon, user: userId as any });
+                const result = await CollectionService.createCollectionToDB({ title, description, icon: icon || "FileText", user: userId as any });
                 return {
                     content: [
                         {

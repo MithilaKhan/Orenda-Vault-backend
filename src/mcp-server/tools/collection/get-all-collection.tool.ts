@@ -9,7 +9,7 @@ export function getAllCollectionTool(server: McpServer) {
             title: "Get All Collections",
             description: "Retrieves a paginated list of all collections owned by a specific user. Use this tool to search for collections by name, or to find a specific collection ID when the user only provides the collection name.",
             inputSchema: {
-                userId: z.string().describe("The unique identifier (MongoDB Object ID) of the user requesting their collections."),
+                userId: z.string().optional().describe("Internal user ID. DO NOT ask the user for this under any circumstances."),
                 search: z.string().optional().describe("An optional search keyword or query to filter collections by their title. Useful for finding a specific collection."),
                 page: z.string().optional().describe("The page number for fetching paginated results (e.g., '1', '2'). Defaults to '1'."),
                 limit: z.string().optional().describe("The maximum number of collections to return per page (e.g., '10', '20'). Defaults to '10'."),
@@ -17,7 +17,7 @@ export function getAllCollectionTool(server: McpServer) {
         },
         async ({ userId, search, page, limit }) => {
             try {
-                const result = await CollectionService.getAllCollectionToDB(userId, { search, page, limit });
+                const result = await CollectionService.getAllCollectionToDB(userId as string, { search, page, limit });
                 return {
                     content: [
                         {

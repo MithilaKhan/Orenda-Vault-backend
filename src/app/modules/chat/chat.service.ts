@@ -8,7 +8,14 @@ const openai = new OpenAI({
   apiKey: config.openai_api_key || process.env.OPENAI_API_KEY,
 });
 
-const processChatMessage = async (messages: any[]) => {
+const processChatMessage = async (messages: any[], userId?: string) => {
+  if (!userId) {
+    return {
+      text: "Please sign in or log in to your account first so I can access and manage your notes and collections.",
+      toolResult: null
+    };
+  }
+
   const client = await getClient();
   const toolsResponse = await client.listTools();
   const aiTools = mscpOpenAiTolls(toolsResponse.tools);
@@ -24,7 +31,7 @@ const processChatMessage = async (messages: any[]) => {
   const outputData: any = response.output.find((item: any) => item.type === "function_call");
 
   if (outputData) {
-    const toolRes = await callMcpToolsClient.callTool(outputData.name, outputData.arguments);
+    const toolRes = await callMcpToolsClient.callTool(outputData.name, outputData.arguments, userId);
     const rawText = (toolRes.content as any)?.[0]?.text;
     
     let parsedData = rawText;

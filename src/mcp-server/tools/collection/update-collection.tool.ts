@@ -10,7 +10,7 @@ export function updateCollectionTool(server: McpServer) {
             description: "Modifies or renames an existing collection. Use this tool when the user wants to change a collection's title, description, or icon. If you don't know the collection ID, use 'getAllCollection' to search for it first.",
             inputSchema: {
                 id: z.string().describe("The unique identifier (MongoDB Object ID) of the collection to update."),
-                userId: z.string().describe("The unique identifier of the user making the update request."),
+                userId: z.string().optional().describe("Internal user ID. DO NOT ask the user for this under any circumstances."),
                 title: z.string().optional().describe("The updated name or title for the collection. Provide only if changing the title."),
                 description: z.string().optional().describe("The updated description or summary for the collection. Provide only if changing the description."),
                 icon: z.enum(["FileText", "Code", "Briefcase", "Folder"]).optional().describe("The updated visual icon for the collection. Provide only if changing the icon."),
@@ -23,7 +23,7 @@ export function updateCollectionTool(server: McpServer) {
                 if (description !== undefined) payload.description = description;
                 if (icon !== undefined) payload.icon = icon;
 
-                const result = await CollectionService.updateCollectionToDB(id, payload, userId);
+                const result = await CollectionService.updateCollectionToDB(id, payload, userId as string);
                 return {
                     content: [
                         {
