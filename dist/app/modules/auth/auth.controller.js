@@ -40,7 +40,7 @@ const verifyEmail = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, vo
 }));
 const loginUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const loginData = __rest(req.body, []);
-    const result = yield auth_service_1.AuthService.loginUserFromDB(loginData, res);
+    const result = yield auth_service_1.AuthService.loginUserFromDB(loginData);
     (0, sendResponse_1.default)(res, {
         success: true,
         statusCode: http_status_codes_1.StatusCodes.OK,

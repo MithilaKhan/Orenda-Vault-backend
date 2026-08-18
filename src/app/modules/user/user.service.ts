@@ -9,14 +9,18 @@ import generateOTP from '../../../util/generateOTP';
 import { IUser } from './user.interface';
 import { User } from './user.model';
 import { AuthHelper } from '../auth/auth.helper';
-import { Response } from 'express';
 
-const createUserToDB = async (payload: Partial<IUser>,res:Response) => {
+const createUserToDB = async (payload: Partial<IUser>) => {
   const isExist = await User.findOne({ email: payload.email });
   if (isExist) {
     if(isExist.status === 'delete') throw new ApiError(StatusCodes.BAD_REQUEST, 'You don’t have permission to access this content.It looks like your account has been deactivated.');
     if(!isExist.verified){
-      return await AuthHelper.unverifiedAccountHandle(payload.email!,res);
+      await AuthHelper.unverifiedAccountHandle(payload.email!);
+      return {
+        needsVerification: true,
+        email: payload.email!,
+        message: "Account is not verified. Please check your email for verification code."
+      };
     }
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Email already exist!');
 

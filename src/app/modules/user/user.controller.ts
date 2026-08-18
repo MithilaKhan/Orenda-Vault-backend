@@ -8,7 +8,17 @@ import { UserService } from './user.service';
 const createUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const { ...userData } = req.body;
-    const result = await UserService.createUserToDB(userData,res);
+    const result = await UserService.createUserToDB(userData);
+
+    if (result && 'needsVerification' in result) {
+      sendResponse(res, {
+        success: true,
+        statusCode: StatusCodes.OK,
+        message: result.message,
+        data: { email: result.email },
+      });
+      return;
+    }
 
     sendResponse(res, {
       success: true,

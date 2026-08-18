@@ -31,7 +31,16 @@ const sendResponse_1 = __importDefault(require("../../../shared/sendResponse"));
 const user_service_1 = require("./user.service");
 const createUser = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const userData = __rest(req.body, []);
-    const result = yield user_service_1.UserService.createUserToDB(userData, res);
+    const result = yield user_service_1.UserService.createUserToDB(userData);
+    if (result && 'needsVerification' in result) {
+        (0, sendResponse_1.default)(res, {
+            success: true,
+            statusCode: http_status_codes_1.StatusCodes.OK,
+            message: result.message,
+            data: { email: result.email },
+        });
+        return;
+    }
     (0, sendResponse_1.default)(res, {
         success: true,
         statusCode: http_status_codes_1.StatusCodes.OK,

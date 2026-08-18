@@ -21,13 +21,18 @@ const unlinkFile_1 = __importDefault(require("../../../shared/unlinkFile"));
 const generateOTP_1 = __importDefault(require("../../../util/generateOTP"));
 const user_model_1 = require("./user.model");
 const auth_helper_1 = require("../auth/auth.helper");
-const createUserToDB = (payload, res) => __awaiter(void 0, void 0, void 0, function* () {
+const createUserToDB = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const isExist = yield user_model_1.User.findOne({ email: payload.email });
     if (isExist) {
         if (isExist.status === 'delete')
             throw new ApiError_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, 'You don’t have permission to access this content.It looks like your account has been deactivated.');
         if (!isExist.verified) {
-            return yield auth_helper_1.AuthHelper.unverifiedAccountHandle(payload.email, res);
+            yield auth_helper_1.AuthHelper.unverifiedAccountHandle(payload.email);
+            return {
+                needsVerification: true,
+                email: payload.email,
+                message: "Account is not verified. Please check your email for verification code."
+            };
         }
         throw new ApiError_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, 'Email already exist!');
     }
@@ -43,7 +48,7 @@ const createUserToDB = (payload, res) => __awaiter(void 0, void 0, void 0, funct
         email: createUser.email,
     };
     const createAccountTemplate = emailTemplate_1.emailTemplate.createAccount(values);
-    emailHelper_1.emailHelper.sendEmail(createAccountTemplate);
+    yield emailHelper_1.emailHelper.sendEmail(createAccountTemplate);
     //save to DB
     const authentication = {
         oneTimeCode: otp,

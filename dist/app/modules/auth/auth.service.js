@@ -26,7 +26,7 @@ const resetToken_model_1 = require("../resetToken/resetToken.model");
 const user_model_1 = require("../user/user.model");
 const auth_helper_1 = require("./auth.helper");
 //login
-const loginUserFromDB = (payload, res) => __awaiter(void 0, void 0, void 0, function* () {
+const loginUserFromDB = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password } = payload;
     const isExistUser = yield user_model_1.User.findOne({ email }).select('+password');
     if (!isExistUser) {
@@ -34,7 +34,8 @@ const loginUserFromDB = (payload, res) => __awaiter(void 0, void 0, void 0, func
     }
     //check verified and status
     if (!isExistUser.verified) {
-        return yield auth_helper_1.AuthHelper.unverifiedAccountHandle(email, res);
+        yield auth_helper_1.AuthHelper.unverifiedAccountHandle(email);
+        throw new ApiError_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, "Account is not verified. Please check your email for verification code.");
     }
     //check user status
     if (isExistUser.status === 'delete') {
@@ -65,7 +66,7 @@ const forgetPasswordToDB = (email) => __awaiter(void 0, void 0, void 0, function
         email: isExistUser.email,
     };
     const forgetPassword = emailTemplate_1.emailTemplate.resetPassword(value);
-    emailHelper_1.emailHelper.sendEmail(forgetPassword);
+    yield emailHelper_1.emailHelper.sendEmail(forgetPassword);
     //save to DB
     const authentication = {
         oneTimeCode: otp,

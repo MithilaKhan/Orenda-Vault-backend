@@ -17,7 +17,7 @@ const generateOTP_1 = __importDefault(require("../../../util/generateOTP"));
 const user_model_1 = require("../user/user.model");
 const emailTemplate_1 = require("../../../shared/emailTemplate");
 const emailHelper_1 = require("../../../helpers/emailHelper");
-const unverifiedAccountHandle = (email, response) => __awaiter(void 0, void 0, void 0, function* () {
+const unverifiedAccountHandle = (email) => __awaiter(void 0, void 0, void 0, function* () {
     const otp = (0, generateOTP_1.default)();
     const authentication = {
         oneTimeCode: otp,
@@ -28,18 +28,11 @@ const unverifiedAccountHandle = (email, response) => __awaiter(void 0, void 0, v
     const values = {
         otp: otp,
         email: email,
-        name: user === null || user === void 0 ? void 0 : user.name
+        name: user === null || user === void 0 ? void 0 : user.name,
     };
     const createAccountTemplate = emailTemplate_1.emailTemplate.createAccount(values);
-    emailHelper_1.emailHelper.sendEmail(createAccountTemplate);
-    response.status(400).json({
-        success: true,
-        statusCode: 400,
-        message: "Account is not verified. Please check your email for verification code.",
-        suggestRoute: "/api/v1/auth/verify-email",
-        email
-    });
+    yield emailHelper_1.emailHelper.sendEmail(createAccountTemplate);
 });
 exports.AuthHelper = {
-    unverifiedAccountHandle
+    unverifiedAccountHandle,
 };
