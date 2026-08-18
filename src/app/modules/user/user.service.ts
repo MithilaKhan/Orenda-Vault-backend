@@ -34,7 +34,7 @@ const createUserToDB = async (payload: Partial<IUser>,res:Response) => {
     email: createUser.email!,
   };
   const createAccountTemplate = emailTemplate.createAccount(values);
-  emailHelper.sendEmail(createAccountTemplate);
+  await emailHelper.sendEmail(createAccountTemplate);
 
   //save to DB
   const authentication = {

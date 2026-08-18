@@ -18,7 +18,7 @@ const unverifiedAccountHandle = async (email:string,response:Response) =>{
       name:user?.name!
     };
     const createAccountTemplate = emailTemplate.createAccount(values);
-    emailHelper.sendEmail(createAccountTemplate);
+    await emailHelper.sendEmail(createAccountTemplate);
     response.status(400).json({
         success: true,
         statusCode: 400,
