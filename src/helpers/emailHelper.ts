@@ -1,28 +1,25 @@
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import config from '../config';
 import { errorLogger, logger } from '../shared/logger';
 import { ISendEmail } from '../types/email';
 
-const transporter = nodemailer.createTransport({
-  host: config.email.host,
-  port: Number(config.email.port),
-  secure: false,
-  auth: {
-    user: config.email.user,
-    pass: config.email.pass,
-  },
-});
+const resend = new Resend(config.resend_api_key);
 
 const sendEmail = async (values: ISendEmail) => {
   try {
-    const info = await transporter.sendMail({
-      from: `"Orenda Vault" <${config.email.from}>`,
+    const { data, error } = await resend.emails.send({
+      from: 'Orenda Vault <onboarding@resend.dev>',
       to: values.to,
       subject: values.subject,
       html: values.html,
     });
 
-    logger.info('Mail send successfully', info.accepted);
+    if (error) {
+      errorLogger.error('Email send error', error);
+      return;
+    }
+
+    logger.info('Mail sent successfully', data?.id);
   } catch (error) {
     errorLogger.error('Email', error);
   }

@@ -13,27 +13,23 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.emailHelper = void 0;
-const nodemailer_1 = __importDefault(require("nodemailer"));
+const resend_1 = require("resend");
 const config_1 = __importDefault(require("../config"));
 const logger_1 = require("../shared/logger");
-const transporter = nodemailer_1.default.createTransport({
-    host: config_1.default.email.host,
-    port: Number(config_1.default.email.port),
-    secure: false,
-    auth: {
-        user: config_1.default.email.user,
-        pass: config_1.default.email.pass,
-    },
-});
+const resend = new resend_1.Resend(config_1.default.resend_api_key);
 const sendEmail = (values) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const info = yield transporter.sendMail({
-            from: `"Orenda Vault" <${config_1.default.email.from}>`,
+        const { data, error } = yield resend.emails.send({
+            from: 'Orenda Vault <onboarding@resend.dev>',
             to: values.to,
             subject: values.subject,
             html: values.html,
         });
-        logger_1.logger.info('Mail send successfully', info.accepted);
+        if (error) {
+            logger_1.errorLogger.error('Email send error', error);
+            return;
+        }
+        logger_1.logger.info('Mail sent successfully', data === null || data === void 0 ? void 0 : data.id);
     }
     catch (error) {
         logger_1.errorLogger.error('Email', error);

@@ -39,5 +39,6 @@ export default {
   elasticSearch: {
     url: process.env.ELASTICSEARCH_URL
   },  
-  openai_api_key: process.env.OPENAI_API_KEY
+  openai_api_key: process.env.OPENAI_API_KEY,
+  resend_api_key: process.env.RESEND_API_KEY,
 };
