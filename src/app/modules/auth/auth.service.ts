@@ -20,7 +20,7 @@ import { Response } from 'express';
 import { AuthHelper } from './auth.helper';
 
 //login
-const loginUserFromDB = async (payload: ILoginData,res:Response) => {
+const loginUserFromDB = async (payload: ILoginData, res: Response) => {
   const { email, password } = payload;
   const isExistUser = await User.findOne({ email }).select('+password');
   if (!isExistUser) {
@@ -29,7 +29,7 @@ const loginUserFromDB = async (payload: ILoginData,res:Response) => {
 
   //check verified and status
   if (!isExistUser.verified) {
-   return await AuthHelper.unverifiedAccountHandle(email,res);
+    return await AuthHelper.unverifiedAccountHandle(email, res);
   }
 
   //check user status
@@ -40,7 +40,7 @@ const loginUserFromDB = async (payload: ILoginData,res:Response) => {
     );
   }
 
-  if(!password){
+  if (!password) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Password is required!');
   }
 
@@ -76,7 +76,7 @@ const forgetPasswordToDB = async (email: string) => {
     email: isExistUser.email,
   };
   const forgetPassword = emailTemplate.resetPassword(value);
-  emailHelper.sendEmail(forgetPassword);
+  await emailHelper.sendEmail(forgetPassword);
 
   //save to DB
   const authentication = {
