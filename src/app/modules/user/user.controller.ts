@@ -9,6 +9,7 @@ const createUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const { ...userData } = req.body;
     const result = await UserService.createUserToDB(userData);
+    
 
     if (result && 'needsVerification' in result) {
       sendResponse(res, {
