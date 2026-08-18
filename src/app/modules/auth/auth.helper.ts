@@ -1,4 +1,5 @@
 import { Response } from "express";
+import { StatusCodes } from "http-status-codes";
 import generateOTP from "../../../util/generateOTP";
 import { User } from "../user/user.model";
 import { emailTemplate } from "../../../shared/emailTemplate";
@@ -19,9 +20,9 @@ const unverifiedAccountHandle = async (email:string,response:Response) =>{
     };
     const createAccountTemplate = emailTemplate.createAccount(values);
     await emailHelper.sendEmail(createAccountTemplate);
-    response.status(400).json({
+    response.status(StatusCodes.OK).json({
         success: true,
-        statusCode: 400,
+        statusCode: StatusCodes.OK,
         message: "Account is not verified. Please check your email for verification code.",
         suggestRoute: "/api/v1/auth/verify-email",
         email
