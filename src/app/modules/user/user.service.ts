@@ -21,7 +21,7 @@ const createUserToDB = async (payload: Partial<IUser>) => {
         needsVerification: true,
         email: payload.email!,
         message: "Account is not verified. Please check your email for verification code.",
-        ...(config.node_env === 'development' && { otp }),
+        otp,
       };
     }
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Email already exist!');
@@ -54,7 +54,7 @@ const createUserToDB = async (payload: Partial<IUser>) => {
 
   return {
     ...createUser.toObject(),
-    ...(config.node_env === 'development' && { otp }),
+    otp,
   };
 };
 

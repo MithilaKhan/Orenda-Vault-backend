@@ -21,7 +21,6 @@ const unlinkFile_1 = __importDefault(require("../../../shared/unlinkFile"));
 const generateOTP_1 = __importDefault(require("../../../util/generateOTP"));
 const user_model_1 = require("./user.model");
 const auth_helper_1 = require("../auth/auth.helper");
-const config_1 = __importDefault(require("../../../config"));
 const createUserToDB = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const isExist = yield user_model_1.User.findOne({ email: payload.email });
     if (isExist) {
@@ -29,7 +28,12 @@ const createUserToDB = (payload) => __awaiter(void 0, void 0, void 0, function* 
             throw new ApiError_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, 'You don’t have permission to access this content.It looks like your account has been deactivated.');
         if (!isExist.verified) {
             const otp = yield auth_helper_1.AuthHelper.unverifiedAccountHandle(payload.email);
-            return Object.assign({ needsVerification: true, email: payload.email, message: "Account is not verified. Please check your email for verification code." }, (config_1.default.node_env === 'development' && { otp }));
+            return {
+                needsVerification: true,
+                email: payload.email,
+                message: "Account is not verified. Please check your email for verification code.",
+                otp,
+            };
         }
         throw new ApiError_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, 'Email already exist!');
     }
@@ -52,7 +56,7 @@ const createUserToDB = (payload) => __awaiter(void 0, void 0, void 0, function* 
         expireAt: new Date(Date.now() + 3 * 60000),
     };
     yield user_model_1.User.findOneAndUpdate({ _id: createUser._id }, { $set: { authentication } });
-    return Object.assign(Object.assign({}, createUser.toObject()), (config_1.default.node_env === 'development' && { otp }));
+    return Object.assign(Object.assign({}, createUser.toObject()), { otp });
 });
 const getUserProfileFromDB = (user) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = user;
