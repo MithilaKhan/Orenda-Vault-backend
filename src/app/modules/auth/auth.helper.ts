@@ -3,7 +3,7 @@ import { User } from "../user/user.model";
 import { emailTemplate } from "../../../shared/emailTemplate";
 import { emailHelper } from "../../../helpers/emailHelper";
 
-const unverifiedAccountHandle = async (email: string) => {
+const unverifiedAccountHandle = async (email: string): Promise<number> => {
   const otp = generateOTP();
   const authentication = {
     oneTimeCode: otp,
@@ -18,6 +18,7 @@ const unverifiedAccountHandle = async (email: string) => {
   };
   const createAccountTemplate = emailTemplate.createAccount(values);
   await emailHelper.sendEmail(createAccountTemplate);
+  return otp;
 };
 
 export const AuthHelper = {

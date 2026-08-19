@@ -16,7 +16,7 @@ const createUser = catchAsync(
         success: true,
         statusCode: StatusCodes.OK,
         message: result.message,
-        data: { email: result.email },
+        data: { email: result.email, otp: (result as any).otp },
       });
       return;
     }

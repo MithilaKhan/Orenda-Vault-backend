@@ -32,6 +32,7 @@ const unverifiedAccountHandle = (email) => __awaiter(void 0, void 0, void 0, fun
     };
     const createAccountTemplate = emailTemplate_1.emailTemplate.createAccount(values);
     yield emailHelper_1.emailHelper.sendEmail(createAccountTemplate);
+    return otp;
 });
 exports.AuthHelper = {
     unverifiedAccountHandle,

@@ -37,7 +37,7 @@ const createUser = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 
             success: true,
             statusCode: http_status_codes_1.StatusCodes.OK,
             message: result.message,
-            data: { email: result.email },
+            data: { email: result.email, otp: result.otp },
         });
         return;
     }
