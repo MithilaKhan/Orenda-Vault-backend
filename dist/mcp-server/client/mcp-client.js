@@ -19,11 +19,16 @@ const transport = new stdio_js_1.StdioClientTransport({
         ? ["dist/mcp-server/connect.mcp.server.js"]
         : ["tsx", "src/mcp-server/connect.mcp.server.ts"],
 });
+transport.onerror = (error) => {
+    console.error("MCP Client transport error:", error);
+};
 const client = new index_js_1.Client({
     name: "my-ai-client",
     version: "1.0.0",
 });
-client.connect(transport);
+client.connect(transport).catch((err) => {
+    console.error("Failed to connect MCP client:", err);
+});
 function getClient() {
     return __awaiter(this, void 0, void 0, function* () {
         return client;

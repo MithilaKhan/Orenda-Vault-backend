@@ -17,6 +17,11 @@ const stdio_js_1 = require("@modelcontextprotocol/sdk/server/stdio.js");
 const mcp_server_1 = require("./mcp.server");
 const mongoose_1 = __importDefault(require("mongoose"));
 const config_1 = __importDefault(require("../config"));
+process.on('uncaughtException', (err) => {
+    if ((err === null || err === void 0 ? void 0 : err.code) === 'EPIPE')
+        return;
+    console.error('Uncaught Exception:', err);
+});
 function mcpServerConnect() {
     return __awaiter(this, void 0, void 0, function* () {
         if (config_1.default.database_url) {
@@ -24,6 +29,9 @@ function mcpServerConnect() {
             console.error("🚀 Database connected for MCP server");
         }
         const transport = new stdio_js_1.StdioServerTransport();
+        transport.onerror = (error) => {
+            console.error("MCP Server transport error:", error);
+        };
         yield mcp_server_1.server.connect(transport);
         console.error("✅ MCP Server is running...");
     });

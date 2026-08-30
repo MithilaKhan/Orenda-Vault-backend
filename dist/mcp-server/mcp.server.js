@@ -24,6 +24,7 @@ const create_note_tool_1 = require("./tools/note/create-note.tool");
 const get_all_note_tool_1 = require("./tools/note/get-all-note.tool");
 const update_note_tool_1 = require("./tools/note/update-note.tool");
 const delete_note_tool_1 = require("./tools/note/delete-note.tool");
+const check_title_tool_1 = require("./tools/check-title.tool");
 exports.server = new mcp_js_1.McpServer({
     name: "mongodb-mcp-server",
     version: "1.0.0",
@@ -45,6 +46,7 @@ exports.server.registerTool("sayHello", {
         ]
     };
 }));
+(0, check_title_tool_1.checkTitleTool)(exports.server);
 (0, create_collection_tool_1.createCollectionTool)(exports.server);
 (0, get_all_collection_tool_1.getAllCollectionTool)(exports.server);
 (0, get_collection_by_id_tool_1.getCollectionByIdTool)(exports.server);

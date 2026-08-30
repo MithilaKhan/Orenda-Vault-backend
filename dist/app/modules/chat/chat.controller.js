@@ -14,11 +14,35 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatController = void 0;
 const http_status_codes_1 = require("http-status-codes");
+const config_1 = __importDefault(require("../../../config"));
+const jwtHelper_1 = require("../../../helpers/jwtHelper");
 const catchAsync_1 = __importDefault(require("../../../shared/catchAsync"));
 const sendResponse_1 = __importDefault(require("../../../shared/sendResponse"));
 const chat_service_1 = require("./chat.service");
-const jwtHelper_1 = require("../../../helpers/jwtHelper");
-const config_1 = __importDefault(require("../../../config"));
+/**
+ * Helper to safely extract user ID from JWT token or request user object.
+ */
+const extractUserIdFromReq = (req) => {
+    var _a;
+    if ((_a = req.user) === null || _a === void 0 ? void 0 : _a.id) {
+        return req.user.id;
+    }
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.split(' ')[1];
+        try {
+            const verifyUser = jwtHelper_1.jwtHelper.verifyToken(token, config_1.default.jwt.jwt_secret);
+            return verifyUser === null || verifyUser === void 0 ? void 0 : verifyUser.id;
+        }
+        catch (_b) {
+            return undefined;
+        }
+    }
+    return undefined;
+};
+/**
+ * Handles incoming chat messages sent to Orenda-vault AI.
+ */
 const sendMessage = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { messages } = req.body;
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
@@ -29,19 +53,7 @@ const sendMessage = (0, catchAsync_1.default)((req, res, next) => __awaiter(void
             data: null,
         });
     }
-    const tokenWithBearer = req.headers.authorization;
-    let userId = undefined;
-    if (tokenWithBearer && tokenWithBearer.startsWith('Bearer ')) {
-        const token = tokenWithBearer.split(' ')[1];
-        try {
-            const verifyUser = jwtHelper_1.jwtHelper.verifyToken(token, config_1.default.jwt.jwt_secret);
-            req.user = verifyUser;
-            userId = verifyUser.id;
-        }
-        catch (error) {
-            // Ignore token verification errors
-        }
-    }
+    const userId = extractUserIdFromReq(req);
     const result = yield chat_service_1.ChatService.processChatMessage(messages, userId);
     (0, sendResponse_1.default)(res, {
         success: true,
@@ -50,4 +62,50 @@ const sendMessage = (0, catchAsync_1.default)((req, res, next) => __awaiter(void
         data: result,
     });
 }));
-exports.ChatController = { sendMessage };
+/**
+ * Retrieves past conversation history for the user.
+ */
+const getChatHistory = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = extractUserIdFromReq(req);
+    if (!userId) {
+        return (0, sendResponse_1.default)(res, {
+            success: true,
+            statusCode: http_status_codes_1.StatusCodes.OK,
+            message: 'User is not logged in',
+            data: [],
+        });
+    }
+    const result = yield chat_service_1.ChatService.getChatHistory(userId);
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_codes_1.StatusCodes.OK,
+        message: 'Chat history retrieved successfully',
+        data: result,
+    });
+}));
+/**
+ * Clears all chat history for the user.
+ */
+const clearChatHistory = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = extractUserIdFromReq(req);
+    if (!userId) {
+        return (0, sendResponse_1.default)(res, {
+            success: false,
+            statusCode: http_status_codes_1.StatusCodes.UNAUTHORIZED,
+            message: 'You are not authorized',
+            data: null,
+        });
+    }
+    const result = yield chat_service_1.ChatService.clearChatHistory(userId);
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: http_status_codes_1.StatusCodes.OK,
+        message: 'Chat history cleared successfully',
+        data: result,
+    });
+}));
+exports.ChatController = {
+    sendMessage,
+    getChatHistory,
+    clearChatHistory,
+};

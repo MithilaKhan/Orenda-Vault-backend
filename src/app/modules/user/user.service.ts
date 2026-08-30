@@ -1,56 +1,60 @@
 import { StatusCodes } from 'http-status-codes';
 import { JwtPayload } from 'jsonwebtoken';
-import { USER_ROLES } from '../../../enums/user';
 import ApiError from '../../../errors/ApiError';
 import { emailHelper } from '../../../helpers/emailHelper';
 import { emailTemplate } from '../../../shared/emailTemplate';
 import unlinkFile from '../../../shared/unlinkFile';
 import generateOTP from '../../../util/generateOTP';
+import { AuthHelper } from '../auth/auth.helper';
 import { IUser } from './user.interface';
 import { User } from './user.model';
-import { AuthHelper } from '../auth/auth.helper';
-import config from '../../../config';
 
+/**
+ * Creates a new user account or re-sends verification code if existing account is unverified.
+ */
 const createUserToDB = async (payload: Partial<IUser>) => {
   const isExist = await User.findOne({ email: payload.email });
+
   if (isExist) {
-    if(isExist.status === 'delete') throw new ApiError(StatusCodes.BAD_REQUEST, 'You don’t have permission to access this content.It looks like your account has been deactivated.');
-    if(!isExist.verified){
+    if (isExist.status === 'delete') {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'You don’t have permission to access this content. It looks like your account has been deactivated.'
+      );
+    }
+    if (!isExist.verified) {
       const otp = await AuthHelper.unverifiedAccountHandle(payload.email!);
       return {
         needsVerification: true,
         email: payload.email!,
-        message: "Account is not verified. Please check your email for verification code.",
+        message: 'Account is not verified. Please check your email for verification code.',
         otp,
       };
     }
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Email already exist!');
-
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Email already exists!');
   }
+
   const createUser = await User.create(payload);
   if (!createUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to create user');
   }
 
-  //send email
+  // Generate and send verification email
   const otp = generateOTP();
   const values = {
     name: createUser.name,
-    otp: otp,
+    otp,
     email: createUser.email!,
   };
   const createAccountTemplate = emailTemplate.createAccount(values);
   await emailHelper.sendEmail(createAccountTemplate);
 
-  //save to DB
+  // Save OTP & expiry to DB
   const authentication = {
     oneTimeCode: otp,
     expireAt: new Date(Date.now() + 3 * 60000),
   };
-  await User.findOneAndUpdate(
-    { _id: createUser._id },
-    { $set: { authentication } }
-  );
+  await User.findOneAndUpdate({ _id: createUser._id }, { $set: { authentication } });
 
   return {
     ...createUser.toObject(),
@@ -58,9 +62,10 @@ const createUserToDB = async (payload: Partial<IUser>) => {
   };
 };
 
-const getUserProfileFromDB = async (
-  user: JwtPayload
-): Promise<Partial<IUser>> => {
+/**
+ * Retrieves the profile data for an authenticated user.
+ */
+const getUserProfileFromDB = async (user: JwtPayload): Promise<Partial<IUser>> => {
   const { id } = user;
   const isExistUser = await User.isExistUserById(id);
   if (!isExistUser) {
@@ -70,25 +75,21 @@ const getUserProfileFromDB = async (
   return isExistUser;
 };
 
-const updateProfileToDB = async (
-  user: JwtPayload,
-  payload: Partial<IUser>
-): Promise<Partial<IUser | null>> => {
+/**
+ * Updates profile information for an authenticated user.
+ */
+const updateProfileToDB = async (user: JwtPayload, payload: Partial<IUser>): Promise<Partial<IUser | null>> => {
   const { id } = user;
   const isExistUser = await User.isExistUserById(id);
   if (!isExistUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
   }
 
-  //unlink file here
-  if (payload.image) {
+  if (payload.image && isExistUser.image) {
     unlinkFile(isExistUser.image);
   }
 
-  const updateDoc = await User.findOneAndUpdate({ _id: id }, payload, {
-    new: true,
-  });
-
+  const updateDoc = await User.findOneAndUpdate({ _id: id }, payload, { new: true });
   return updateDoc;
 };
 

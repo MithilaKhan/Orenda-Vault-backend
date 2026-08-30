@@ -9,6 +9,7 @@ import { createNoteTool } from "./tools/note/create-note.tool";
 import { getAllNoteTool } from "./tools/note/get-all-note.tool";
 import { updateNoteTool } from "./tools/note/update-note.tool";
 import { deleteNoteTool } from "./tools/note/delete-note.tool";
+import { checkTitleTool } from "./tools/check-title.tool";
 
 
 export const server = new McpServer({
@@ -38,6 +39,7 @@ server.registerTool(
     }
 )
 
+checkTitleTool(server);
 createCollectionTool(server);
 getAllCollectionTool(server);
 getCollectionByIdTool(server);

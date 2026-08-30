@@ -19,38 +19,42 @@ const emailHelper_1 = require("../../../helpers/emailHelper");
 const emailTemplate_1 = require("../../../shared/emailTemplate");
 const unlinkFile_1 = __importDefault(require("../../../shared/unlinkFile"));
 const generateOTP_1 = __importDefault(require("../../../util/generateOTP"));
-const user_model_1 = require("./user.model");
 const auth_helper_1 = require("../auth/auth.helper");
+const user_model_1 = require("./user.model");
+/**
+ * Creates a new user account or re-sends verification code if existing account is unverified.
+ */
 const createUserToDB = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const isExist = yield user_model_1.User.findOne({ email: payload.email });
     if (isExist) {
-        if (isExist.status === 'delete')
-            throw new ApiError_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, 'You don’t have permission to access this content.It looks like your account has been deactivated.');
+        if (isExist.status === 'delete') {
+            throw new ApiError_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, 'You don’t have permission to access this content. It looks like your account has been deactivated.');
+        }
         if (!isExist.verified) {
             const otp = yield auth_helper_1.AuthHelper.unverifiedAccountHandle(payload.email);
             return {
                 needsVerification: true,
                 email: payload.email,
-                message: "Account is not verified. Please check your email for verification code.",
+                message: 'Account is not verified. Please check your email for verification code.',
                 otp,
             };
         }
-        throw new ApiError_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, 'Email already exist!');
+        throw new ApiError_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, 'Email already exists!');
     }
     const createUser = yield user_model_1.User.create(payload);
     if (!createUser) {
         throw new ApiError_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, 'Failed to create user');
     }
-    //send email
+    // Generate and send verification email
     const otp = (0, generateOTP_1.default)();
     const values = {
         name: createUser.name,
-        otp: otp,
+        otp,
         email: createUser.email,
     };
     const createAccountTemplate = emailTemplate_1.emailTemplate.createAccount(values);
     yield emailHelper_1.emailHelper.sendEmail(createAccountTemplate);
-    //save to DB
+    // Save OTP & expiry to DB
     const authentication = {
         oneTimeCode: otp,
         expireAt: new Date(Date.now() + 3 * 60000),
@@ -58,6 +62,9 @@ const createUserToDB = (payload) => __awaiter(void 0, void 0, void 0, function* 
     yield user_model_1.User.findOneAndUpdate({ _id: createUser._id }, { $set: { authentication } });
     return Object.assign(Object.assign({}, createUser.toObject()), { otp });
 });
+/**
+ * Retrieves the profile data for an authenticated user.
+ */
 const getUserProfileFromDB = (user) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = user;
     const isExistUser = yield user_model_1.User.isExistUserById(id);
@@ -66,19 +73,19 @@ const getUserProfileFromDB = (user) => __awaiter(void 0, void 0, void 0, functio
     }
     return isExistUser;
 });
+/**
+ * Updates profile information for an authenticated user.
+ */
 const updateProfileToDB = (user, payload) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = user;
     const isExistUser = yield user_model_1.User.isExistUserById(id);
     if (!isExistUser) {
         throw new ApiError_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, "User doesn't exist!");
     }
-    //unlink file here
-    if (payload.image) {
+    if (payload.image && isExistUser.image) {
         (0, unlinkFile_1.default)(isExistUser.image);
     }
-    const updateDoc = yield user_model_1.User.findOneAndUpdate({ _id: id }, payload, {
-        new: true,
-    });
+    const updateDoc = yield user_model_1.User.findOneAndUpdate({ _id: id }, payload, { new: true });
     return updateDoc;
 });
 exports.UserService = {

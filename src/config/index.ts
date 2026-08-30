@@ -29,16 +29,16 @@ export default {
     webhook_secret: process.env.WEBHOOK_SECRET,
   },
 
-  redis:{
+  redis: {
     host: process.env.REDIS_HOST,
     port: process.env.REDIS_PORT
   },
-  kafka:{
+  kafka: {
     url: process.env.KAFKA_URL
   },
   elasticSearch: {
     url: process.env.ELASTICSEARCH_URL
-  },  
+  },
   openai_api_key: process.env.OPENAI_API_KEY,
   resend_api_key: process.env.RESEND_API_KEY,
 };
