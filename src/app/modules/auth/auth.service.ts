@@ -28,11 +28,12 @@ const loginUserFromDB = async (payload: ILoginData) => {
 
   //check verified and status
   if (!isExistUser.verified) {
-    await AuthHelper.unverifiedAccountHandle(email);
-    throw new ApiError(
-      StatusCodes.BAD_REQUEST,
-      "Account is not verified. Please check your email for verification code."
-    );
+    const otp = await AuthHelper.unverifiedAccountHandle(email);
+    return {
+      needsVerification: true,
+      email,
+      otp,
+    };
   }
 
   //check user status
@@ -87,6 +88,8 @@ const forgetPasswordToDB = async (email: string) => {
     expireAt: new Date(Date.now() + 3 * 60000),
   };
   await User.findOneAndUpdate({ email }, { $set: { authentication } });
+
+  return { otp };
 };
 
 //verify email

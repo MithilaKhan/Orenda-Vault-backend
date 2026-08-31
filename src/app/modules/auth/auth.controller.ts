@@ -20,6 +20,16 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
   const { ...loginData } = req.body;
   const result = await AuthService.loginUserFromDB(loginData);
 
+  if (result && 'needsVerification' in result) {
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'Account is not verified. Please check your email for verification code.',
+      data: { email: result.email, otp: result.otp, needsVerification: true },
+    });
+    return;
+  }
+
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,

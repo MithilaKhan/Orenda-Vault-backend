@@ -34,8 +34,12 @@ const loginUserFromDB = (payload) => __awaiter(void 0, void 0, void 0, function*
     }
     //check verified and status
     if (!isExistUser.verified) {
-        yield auth_helper_1.AuthHelper.unverifiedAccountHandle(email);
-        throw new ApiError_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, "Account is not verified. Please check your email for verification code.");
+        const otp = yield auth_helper_1.AuthHelper.unverifiedAccountHandle(email);
+        return {
+            needsVerification: true,
+            email,
+            otp,
+        };
     }
     //check user status
     if (isExistUser.status === 'delete') {
@@ -73,6 +77,7 @@ const forgetPasswordToDB = (email) => __awaiter(void 0, void 0, void 0, function
         expireAt: new Date(Date.now() + 3 * 60000),
     };
     yield user_model_1.User.findOneAndUpdate({ email }, { $set: { authentication } });
+    return { otp };
 });
 //verify email
 const verifyEmailToDB = (payload) => __awaiter(void 0, void 0, void 0, function* () {

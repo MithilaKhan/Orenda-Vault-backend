@@ -7,8 +7,9 @@ const resend = new Resend(config.resend_api_key);
 
 const sendEmail = async (values: ISendEmail) => {
   try {
+    const senderEmail = config.email.from || 'onboarding@resend.dev';
     const { data, error } = await resend.emails.send({
-      from: 'Orenda Vault <onboarding@resend.dev>',
+      from: `Orenda Vault <${senderEmail}>`,
       to: values.to,
       subject: values.subject,
       html: values.html,

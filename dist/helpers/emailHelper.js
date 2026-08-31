@@ -19,8 +19,9 @@ const logger_1 = require("../shared/logger");
 const resend = new resend_1.Resend(config_1.default.resend_api_key);
 const sendEmail = (values) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const senderEmail = config_1.default.email.from || 'onboarding@resend.dev';
         const { data, error } = yield resend.emails.send({
-            from: 'Orenda Vault <onboarding@resend.dev>',
+            from: `Orenda Vault <${senderEmail}>`,
             to: values.to,
             subject: values.subject,
             html: values.html,
