@@ -34,3 +34,28 @@ export const stripSuffixWord = (title: string, type: 'collection' | 'note'): str
     
   return clean.replace(pattern, '').trim();
 };
+
+/**
+ * Builds a flexible multi-keyword fuzzy search filter for MongoDB queries.
+ * Splits search terms by whitespace/punctuation to match any relevant keyword.
+ */
+export const buildFuzzySearchFilter = (searchTerm?: string, textFields: string[] = ['title']) => {
+  if (!searchTerm || !searchTerm.trim()) return {};
+
+  const cleanTerm = searchTerm.trim();
+  const words = cleanTerm
+    .replace(/['"’]/g, '')
+    .split(/[\s,._-]+/)
+    .filter((w) => w.length > 1);
+
+  const termsToMatch = Array.from(new Set([cleanTerm, ...words]));
+
+  const conditions = textFields.flatMap((field) =>
+    termsToMatch.map((term) => ({
+      [field]: { $regex: term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), $options: 'i' },
+    }))
+  );
+
+  return conditions.length > 0 ? { $or: conditions } : {};
+};
+

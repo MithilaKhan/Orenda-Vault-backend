@@ -1,6 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 import ApiError from "../../../errors/ApiError";
-import { createTitleRegex } from "../../shared/titleUtils";
+import { buildFuzzySearchFilter, createTitleRegex } from "../../shared/titleUtils";
 import { Note } from "../note/note.model";
 import { Icollection } from "./collection.interface";
 import { Collection } from "./collection.model";
@@ -29,8 +29,7 @@ const createCollectionToDB = async (payload: Icollection) => {
  * Retrieves paginated collections for an authenticated user with optional keyword search.
  */
 const getAllCollectionToDB = async (userId: string, query: { search?: string; page?: string; limit?: string }) => {
-    const searchTerm = query.search;
-    const searchFilters = searchTerm ? { title: { $regex: searchTerm, $options: "i" } } : {};
+    const searchFilters = buildFuzzySearchFilter(query.search, ["title"]);
     const page = Math.max(1, Number(query.page) || 1);
     const limit = Math.max(1, Number(query.limit) || 10);
     const skip = (page - 1) * limit;

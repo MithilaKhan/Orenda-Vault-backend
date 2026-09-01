@@ -4,7 +4,7 @@
  * Provides reusable sanitization and regex generation for title uniqueness checks across Notes & Collections.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.stripSuffixWord = exports.cleanTitleString = exports.createTitleRegex = void 0;
+exports.buildFuzzySearchFilter = exports.stripSuffixWord = exports.cleanTitleString = exports.createTitleRegex = void 0;
 /**
  * Creates a case-insensitive, exact-match RegExp for MongoDB title queries.
  * Escapes any special regex characters.
@@ -37,3 +37,22 @@ const stripSuffixWord = (title, type) => {
     return clean.replace(pattern, '').trim();
 };
 exports.stripSuffixWord = stripSuffixWord;
+/**
+ * Builds a flexible multi-keyword fuzzy search filter for MongoDB queries.
+ * Splits search terms by whitespace/punctuation to match any relevant keyword.
+ */
+const buildFuzzySearchFilter = (searchTerm, textFields = ['title']) => {
+    if (!searchTerm || !searchTerm.trim())
+        return {};
+    const cleanTerm = searchTerm.trim();
+    const words = cleanTerm
+        .replace(/['"’]/g, '')
+        .split(/[\s,._-]+/)
+        .filter((w) => w.length > 1);
+    const termsToMatch = Array.from(new Set([cleanTerm, ...words]));
+    const conditions = textFields.flatMap((field) => termsToMatch.map((term) => ({
+        [field]: { $regex: term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), $options: 'i' },
+    })));
+    return conditions.length > 0 ? { $or: conditions } : {};
+};
+exports.buildFuzzySearchFilter = buildFuzzySearchFilter;

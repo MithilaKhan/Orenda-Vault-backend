@@ -1,9 +1,10 @@
 import { StatusCodes } from "http-status-codes";
 import ApiError from "../../../errors/ApiError";
-import { createTitleRegex } from "../../shared/titleUtils";
+import { buildFuzzySearchFilter, createTitleRegex } from "../../shared/titleUtils";
 import { Collection } from "../collection/collection.model";
 import { Inote } from "./note.interface";
 import { Note } from "./note.model";
+
 
 /**
  * Normalizes optional collection reference ID in payload.
@@ -43,8 +44,7 @@ const createNoteToDB = async (payload: Inote) => {
  * Retrieves paginated list of notes owned by user with optional keyword search.
  */
 const getAllNoteToDB = async (userId: string, query: { search?: string; page?: string; limit?: string }) => {
-    const searchTerm = query.search;
-    const searchFilters = searchTerm ? { title: { $regex: searchTerm, $options: "i" } } : {};
+    const searchFilters = buildFuzzySearchFilter(query.search, ["title", "content"]);
     const page = Math.max(1, Number(query.page) || 1);
     const limit = Math.max(1, Number(query.limit) || 10);
     const skip = (page - 1) * limit;

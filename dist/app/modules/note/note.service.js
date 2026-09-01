@@ -50,8 +50,7 @@ const createNoteToDB = (payload) => __awaiter(void 0, void 0, void 0, function* 
  * Retrieves paginated list of notes owned by user with optional keyword search.
  */
 const getAllNoteToDB = (userId, query) => __awaiter(void 0, void 0, void 0, function* () {
-    const searchTerm = query.search;
-    const searchFilters = searchTerm ? { title: { $regex: searchTerm, $options: "i" } } : {};
+    const searchFilters = (0, titleUtils_1.buildFuzzySearchFilter)(query.search, ["title", "content"]);
     const page = Math.max(1, Number(query.page) || 1);
     const limit = Math.max(1, Number(query.limit) || 10);
     const skip = (page - 1) * limit;

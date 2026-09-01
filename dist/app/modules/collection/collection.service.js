@@ -38,8 +38,7 @@ const createCollectionToDB = (payload) => __awaiter(void 0, void 0, void 0, func
  * Retrieves paginated collections for an authenticated user with optional keyword search.
  */
 const getAllCollectionToDB = (userId, query) => __awaiter(void 0, void 0, void 0, function* () {
-    const searchTerm = query.search;
-    const searchFilters = searchTerm ? { title: { $regex: searchTerm, $options: "i" } } : {};
+    const searchFilters = (0, titleUtils_1.buildFuzzySearchFilter)(query.search, ["title"]);
     const page = Math.max(1, Number(query.page) || 1);
     const limit = Math.max(1, Number(query.limit) || 10);
     const skip = (page - 1) * limit;
