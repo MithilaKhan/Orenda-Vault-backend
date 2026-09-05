@@ -12,6 +12,8 @@ export async function mcpServerConnect() {
     if (config.database_url) {
         await mongoose.connect(config.database_url as string);
         console.error("🚀 Database connected for MCP server");
+    } else {
+        console.error("⚠️ DATABASE_URL is not defined for MCP server!");
     }
 
     const transport = new StdioServerTransport();
